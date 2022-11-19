@@ -32,7 +32,6 @@ public class PlayerController : MonoBehaviour
         audioPlayer = GetComponent<AudioSource>();
         animator = GetComponent<Animator>();
 
-
     }
     bool GroundCheck()
     {
@@ -66,6 +65,7 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Fruit"))
         {
+          
             Destroy(collision.gameObject);
             audioPlayer.PlayOneShot(itemSound, 1);
         }
