@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 
 public class PlayerController : MonoBehaviour
@@ -10,8 +11,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float jumpPower = 200;
     [SerializeField] LayerMask groundLayer;
     [SerializeField] Text scoreText;
-    int point;
+    [SerializeField] AudioClip jumpSound;
 
+    int point;
+    AudioSource audioPlayer;
     BoxCollider2D bc;
     SpriteRenderer sr;
     Rigidbody2D rb;
@@ -22,6 +25,8 @@ public class PlayerController : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
         bc = GetComponent<BoxCollider2D>();
+        audioPlayer = GetComponent<AudioSource>();
+
 
     }
     bool GroundCheck()
@@ -39,9 +44,10 @@ public class PlayerController : MonoBehaviour
         if (dir > 0)
             sr.flipX = false;
         bool jump = Input.GetButtonDown("Jump");
-        if (jump && GroundCheck())
+        if (jump && GroundCheck()) { 
             rb.AddForce(Vector3.up * jumpPower);
-        
+            audioPlayer.PlayOneShot(jumpSound, 1);
+        }
         scoreText.text = "Score: " + point;
        
 
@@ -52,9 +58,18 @@ public class PlayerController : MonoBehaviour
         {
             Destroy(collision.gameObject);
         }
-        
+        if (collision.gameObject.CompareTag("Trap"))
+        {
+            Invoke("RestartLevel", 1);
+
+        }
+
         if (collision.gameObject.name.Contains("Cherries"))
             point += 20;
+    }
+    private void RestartLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
 }
