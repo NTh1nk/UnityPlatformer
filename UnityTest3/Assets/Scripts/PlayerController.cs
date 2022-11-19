@@ -10,12 +10,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float jumpPower = 200;
     [SerializeField] LayerMask groundLayer;
     [SerializeField] Text scoreText;
-
+    int point;
 
     BoxCollider2D bc;
     SpriteRenderer sr;
     Rigidbody2D rb;
-    int point;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -41,8 +41,9 @@ public class PlayerController : MonoBehaviour
         bool jump = Input.GetButtonDown("Jump");
         if (jump && GroundCheck())
             rb.AddForce(Vector3.up * jumpPower);
+        
         scoreText.text = "Score: " + point;
-        scoreText.text = "Score: ";
+       
 
     }
     private void OnTriggerEnter2D(Collider2D collision)
