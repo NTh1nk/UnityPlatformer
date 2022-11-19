@@ -12,8 +12,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] LayerMask groundLayer;
     [SerializeField] Text scoreText;
     [SerializeField] AudioClip jumpSound;
+    [SerializeField] AudioClip deathsound;
+    [SerializeField] AudioClip itemSound;
+
 
     int point;
+    Animator animator;
     AudioSource audioPlayer;
     BoxCollider2D bc;
     SpriteRenderer sr;
@@ -26,6 +30,7 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         bc = GetComponent<BoxCollider2D>();
         audioPlayer = GetComponent<AudioSource>();
+        animator = GetComponent<Animator>();
 
 
     }
@@ -39,6 +44,7 @@ public class PlayerController : MonoBehaviour
     {
         float dir = Input.GetAxisRaw("Horizontal");
         transform.Translate(dir * speed * Time.deltaTime, 0, 0);
+        rb.velocity = new Vector2(0, rb.velocity.y);
         if (dir < 0)
             sr.flipX = true;
         if (dir > 0)
@@ -48,6 +54,10 @@ public class PlayerController : MonoBehaviour
             rb.AddForce(Vector3.up * jumpPower);
             audioPlayer.PlayOneShot(jumpSound, 1);
         }
+        if (dir == 0)
+            animator.SetBool("Run", false);
+        else
+            animator.SetBool("Run", true);
         scoreText.text = "Score: " + point;
        
 
@@ -57,9 +67,11 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Fruit"))
         {
             Destroy(collision.gameObject);
+            audioPlayer.PlayOneShot(itemSound, 1);
         }
         if (collision.gameObject.CompareTag("Trap"))
         {
+            audioPlayer.PlayOneShot(deathsound, 1);
             Invoke("RestartLevel", 1);
 
         }
@@ -70,6 +82,24 @@ public class PlayerController : MonoBehaviour
     private void RestartLevel()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Fan"))
+        {
+            float distX = collision.gameObject.transform.position.x - gameObject.transform.position.x;
+                   
+            if (Mathf.Abs(distX) < 0.5f)
+                distX = Mathf.Sign(distX) * 0.5f;
+            float distY = Mathf.Abs(collision.gameObject.transform.position.y - gameObject.transform.position.y);
+            float forceY = jumpPower / (7 * distY * distY);
+            float forceX = -jumpPower / (4 * distX);
+            if ((distY < 3) && (rb.velocity.y < 0))
+                forceY *= 3;
+            if (Mathf.Abs(forceY) > 450)
+                forceY = Mathf.Sign(forceY) * 450;
+            rb.AddForce(new Vector2(forceX, forceY));
+        }
     }
 
 }
