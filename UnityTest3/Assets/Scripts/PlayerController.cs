@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
         bc = GetComponent<BoxCollider2D>();
         audioPlayer = GetComponent<AudioSource>();
         animator = GetComponent<Animator>();
+        point = PlayerPrefs.GetInt("Score");
 
     }
     bool GroundCheck()
@@ -76,8 +77,10 @@ public class PlayerController : MonoBehaviour
 
         }
 
-        if (collision.gameObject.name.Contains("Cherries"))
+        if (collision.gameObject.CompareTag("Fruit"))
             point += 20;
+        PlayerPrefs.SetInt("Score", point);
+
     }
     private void RestartLevel()
     {
